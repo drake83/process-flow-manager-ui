@@ -18,8 +18,10 @@ import 'sanitize.css/sanitize.css';
 import { App } from 'app';
 
 import { HelmetProvider } from 'react-helmet-async';
-
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import reportWebVitals from 'reportWebVitals';
+
+const theme = createTheme();
 
 // Observe loading of Inter (to remove 'Inter', remove the <link> tag in
 // the index.html file and this observer)
@@ -33,11 +35,13 @@ openSansObserver.load().then(() => {
 const MOUNT_NODE = document.getElementById('root') as HTMLElement;
 
 ReactDOM.render(
-  <HelmetProvider>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </HelmetProvider>,
+  <ThemeProvider theme={theme}>
+    <HelmetProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </HelmetProvider>
+  </ThemeProvider>,
   MOUNT_NODE,
 );
 
