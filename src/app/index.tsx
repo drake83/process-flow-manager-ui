@@ -14,11 +14,9 @@ import '@fontsource/roboto/700.css';
 import { Helmet } from 'react-helmet-async';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 
-import { GlobalStyle } from '../styles/global-styles';
-
-import { HomePage } from './pages/HomePage/Loadable';
-import { NotFoundPage } from './pages/NotFoundPage/Loadable';
 import { useTranslation } from 'react-i18next';
+import { LoginPage } from './pages/Login/Loadable';
+import { LOGIN } from 'routes';
 
 export function App() {
   const { i18n } = useTranslation();
@@ -33,10 +31,12 @@ export function App() {
       </Helmet>
 
       <Switch>
-        <Route exact path={process.env.PUBLIC_URL + '/'} component={HomePage} />
-        <Route component={NotFoundPage} />
+        <Route
+          exact
+          path={process.env.PUBLIC_URL + LOGIN}
+          component={LoginPage}
+        />
       </Switch>
-      <GlobalStyle />
     </BrowserRouter>
   );
 }

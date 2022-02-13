@@ -1,15 +1,11 @@
-/**
- * Asynchronously loads the component for NotFoundPage
- */
-
+import { CircularProgress } from '@mui/material';
 import * as React from 'react';
 import { lazyLoad } from 'utils/loadable';
-import { LoadingIndicator } from 'app/components/LoadingIndicator';
 
-export const NotFoundPage = lazyLoad(
+export const LoginPage = lazyLoad(
   () => import('./index'),
   module => module.Login,
   {
-    fallback: <LoadingIndicator />,
+    fallback: <CircularProgress />,
   },
 );
