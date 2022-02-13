@@ -1,7 +1,15 @@
-export class ResponseError extends Error {
-  public response: Response;
+import axios, {
+  AxiosRequestConfig,
+  AxiosRequestHeaders,
+  AxiosResponse,
+} from 'axios';
+import { host } from './host';
+import { getCookieValue } from './jwt-cookie';
 
-  constructor(response: Response) {
+export class ResponseError extends Error {
+  public response: AxiosResponse;
+
+  constructor(response: AxiosResponse) {
     super(response.statusText);
     this.response = response;
   }
@@ -13,11 +21,11 @@ export class ResponseError extends Error {
  *
  * @return {object}          The parsed JSON from the request
  */
-function parseJSON(response: Response) {
+function parseJSON(response: AxiosResponse) {
   if (response.status === 204 || response.status === 205) {
     return null;
   }
-  return response.json();
+  return response.data;
 }
 
 /**
@@ -27,13 +35,32 @@ function parseJSON(response: Response) {
  *
  * @return {object|undefined} Returns either the response, or throws an error
  */
-function checkStatus(response: Response) {
+function checkStatus(response: AxiosResponse) {
   if (response.status >= 200 && response.status < 300) {
     return response;
   }
+
   const error = new ResponseError(response);
   error.response = response;
   throw error;
+}
+
+const buildHeaders = (withAuth: boolean) => {
+  const defaultHeaders: AxiosRequestHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  if (withAuth) {
+    const jwt_token = getCookieValue();
+    return { ...defaultHeaders, Authorization: `Bearer ${jwt_token}` };
+  }
+
+  return defaultHeaders;
+};
+
+interface Request extends AxiosRequestConfig {
+  withAuth?: boolean;
 }
 
 /**
@@ -46,9 +73,14 @@ function checkStatus(response: Response) {
  */
 export async function request(
   url: string,
-  options?: RequestInit,
+  options?: Request,
 ): Promise<{} | { err: ResponseError }> {
-  const fetchResponse = await fetch(url, options);
+  const fetchResponse = await axios({
+    baseURL: host,
+    url,
+    method: options?.method || 'get',
+    headers: buildHeaders(options?.withAuth || false),
+  });
   const response = checkStatus(fetchResponse);
   return parseJSON(response);
 }
